@@ -266,3 +266,7 @@ Stored prompts are plain text on disk.
 - [Laya](https://huggingface.co/convaiinnovations/laya) by Convai Innovations, Apache-2.0
 - [agentgateway](https://github.com/agentgateway/agentgateway), Apache-2.0
 - Benchmark comparisons build on [sysone-bench](https://github.com/instax-dutta/sysone-bench)
+
+## License
+
+MIT, see [LICENSE](LICENSE).
