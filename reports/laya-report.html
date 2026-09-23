@@ -1,0 +1,247 @@
+<title>Laya Bench on 8745HS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@500;700&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+:root{
+  --ground:#F4F6F7; --surface:#FFFFFF; --ink:#18232C; --muted:#5A6B77; --rule:#DCE2E6;
+  --laya:#0E7C72; --laya-soft:#D5EEEA; --ml:#5FB3A8; --jev:#9A6B16; --jev-soft:#F3E7CF;
+  --good:#1F7A45; --bad:#B23A3A; --bad-soft:#F6DEDE; --good-soft:#DCEFE3;
+  --display:"Schibsted Grotesk",ui-sans-serif,system-ui,sans-serif;
+  --body:"Source Sans 3",ui-sans-serif,system-ui,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  color-scheme:dark;
+  --ground:#11181D; --surface:#182228; --ink:#E4EAEE; --muted:#93A4AF; --rule:#2A3740;
+  --laya:#43C2B3; --laya-soft:#16332F; --ml:#2E8C80; --jev:#E0A948; --jev-soft:#3A2D14;
+  --good:#5CC98A; --bad:#EE7B7B; --bad-soft:#3D1F22; --good-soft:#15321F;
+}}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --ground:#11181D; --surface:#182228; --ink:#E4EAEE; --muted:#93A4AF; --rule:#2A3740;
+  --laya:#43C2B3; --laya-soft:#16332F; --ml:#2E8C80; --jev:#E0A948; --jev-soft:#3A2D14;
+  --good:#5CC98A; --bad:#EE7B7B; --bad-soft:#3D1F22; --good-soft:#15321F;
+}
+*{box-sizing:border-box}
+body{background:var(--ground);color:var(--ink);font:17px/1.55 var(--body);padding-inline:16px;padding-block:32px 64px}
+main{max-width:960px;margin:0 auto;display:grid;gap:44px}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0;line-height:1.15}
+h1{font-size:clamp(28px,5vw,40px);font-weight:700;letter-spacing:-.01em}
+h2{font-size:23px;font-weight:700}
+h3{font-size:17px;font-weight:500}
+p{margin:0;max-width:68ch}
+.eyebrow{font:600 12px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+header{display:grid;gap:14px}
+.meta{display:flex;flex-wrap:wrap;gap:8px 18px;font:13px/1.4 var(--mono);color:var(--muted)}
+.meta b{color:var(--ink);font-weight:600}
+section{display:grid;gap:16px}
+.lede{color:var(--muted)}
+.findings{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px}
+.finding{background:var(--surface);border:1px solid var(--rule);border-radius:8px;padding:18px;display:grid;gap:6px;align-content:start}
+.finding .num{font:600 30px/1 var(--mono);font-variant-numeric:tabular-nums}
+.finding p{font-size:15.5px;color:var(--muted)}
+.finding p strong{color:var(--ink);font-weight:600}
+.legend{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:14px;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:7px}
+.sw{width:12px;height:12px;border-radius:2px;display:inline-block}
+.chart{background:var(--surface);border:1px solid var(--rule);border-radius:8px;padding:14px 10px 6px;overflow-x:auto}
+.chart svg{display:block;width:100%;min-width:560px;height:auto}
+.chart text{font-family:var(--mono);font-size:12px;fill:var(--muted)}
+.chart .lab{font-family:var(--body);font-size:14px;fill:var(--ink);font-weight:600}
+.chart .val{fill:var(--ink);font-size:11.5px}
+.tablewrap{overflow-x:auto;background:var(--surface);border:1px solid var(--rule);border-radius:8px}
+table{border-collapse:collapse;width:100%;font-size:15px}
+th,td{padding:10px 14px;text-align:right;white-space:nowrap;border-bottom:1px solid var(--rule)}
+th:first-child,td:first-child{text-align:left}
+tbody tr:last-child td{border-bottom:0}
+th{font:600 11.5px/1.3 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted);background:transparent}
+td{font-variant-numeric:tabular-nums}
+td.n{font-family:var(--mono);font-size:14px}
+td .sub{display:block;font:12px var(--mono);color:var(--muted)}
+.d{font:600 13px var(--mono);padding:2px 7px;border-radius:4px}
+.d.neg{color:var(--bad);background:var(--bad-soft)}
+.d.pos{color:var(--good);background:var(--good-soft)}
+.langs{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
+.lang{background:var(--surface);border:1px solid var(--rule);border-radius:8px;padding:14px 16px;display:grid;gap:10px;align-content:start}
+.lang header{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.lang .score{font:12.5px var(--mono);color:var(--muted)}
+.lang .score b{font-weight:600}
+.case{display:grid;gap:4px;padding-top:10px;border-top:1px solid var(--rule)}
+.case .msg{font-size:15px;line-height:1.4}
+.case .msg[dir="rtl"]{text-align:right}
+.case .row{display:flex;flex-wrap:wrap;gap:6px;font:12px/1.2 var(--mono)}
+.chip{padding:3px 7px;border-radius:4px;border:1px solid var(--rule);color:var(--muted)}
+.chip.ok{color:var(--good);background:var(--good-soft);border-color:transparent}
+.chip.no{color:var(--bad);background:var(--bad-soft);border-color:transparent}
+.chip.exp{color:var(--ink)}
+ul.notes{margin:0;padding-left:20px;display:grid;gap:8px;max-width:72ch}
+ul.notes li::marker{color:var(--muted)}
+code{font:14px var(--mono);background:var(--surface);border:1px solid var(--rule);padding:1px 5px;border-radius:4px;word-break:break-all}
+a{color:var(--laya)}
+a:focus-visible{outline:2px solid var(--laya);outline-offset:2px}
+footer{font-size:14px;color:var(--muted);border-top:1px solid var(--rule);padding-top:16px}
+</style>
+
+<main>
+  <header>
+    <span class="eyebrow">sysone-bench · 5 of 9 suites · Laya only, local CPU</span>
+    <h1>Laya vs Jev on five decision tasks</h1>
+    <p class="lede">Laya ran offline on this laptop's CPU. Jev's numbers come from the benchmark's published run and were not re-measured here. Both models answered exactly the same questions: every question-set hash matches the published run.</p>
+    <div class="meta">
+      <span>CPU <b>Ryzen 7 8745HS</b></span>
+      <span>laya <b>0.3.11</b></span>
+      <span>jev <b>1.13.0</b> (published 2026-09-21)</span>
+      <span>run <b>2026-09-23 20:36</b></span>
+      <span>decisions <b>431</b></span>
+    </div>
+  </header>
+
+  <section>
+    <h2>What we found</h2>
+    <div class="findings">
+      <div class="finding">
+        <span class="eyebrow">Reproducibility</span>
+        <span class="num" style="color:var(--laya)">5 / 5</span>
+        <p><strong>Accuracy matched the published Laya run exactly on every suite</strong>, from a different machine and a newer package (0.3.11 vs 0.3.4).</p>
+      </div>
+      <div class="finding">
+        <span class="eyebrow">Gap to Jev (English)</span>
+        <span class="num" style="color:var(--jev)">−8 to −16 pts</span>
+        <p><strong>Jev leads on all four English suites.</strong> The widest gap is moderation (toxicity questions: 0.77 vs 1.00).</p>
+      </div>
+      <div class="finding">
+        <span class="eyebrow">Non-English text</span>
+        <span class="num" style="color:var(--laya)">0.36 → 0.92</span>
+        <p><strong>Switching to the multilingual checkpoint nearly closes the gap</strong> to Jev's 1.00 in five languages, and it's 3× faster per call.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Accuracy by suite</h2>
+    <div class="legend">
+      <span><i class="sw" style="background:var(--laya)"></i>Laya English, this machine</span>
+      <span><i class="sw" style="background:var(--ml)"></i>Laya multilingual, this machine</span>
+      <span><i class="sw" style="background:var(--jev)"></i>Jev 1.13.0, published</span>
+    </div>
+    <div class="chart" id="chart"></div>
+  </section>
+
+  <section>
+    <h2>Full numbers</h2>
+    <p class="lede">ECE (expected calibration error) measures how far the stated confidence is from the actual hit rate. Lower is better. Latency is per call, and one call answers every question for one case at once, so triage (4 questions) is slower than banking (1 question).</p>
+    <div class="tablewrap"><table id="tbl">
+      <thead><tr><th>Suite</th><th>Decisions</th><th>Laya acc</th><th>Jev acc</th><th>Δ</th><th>Laya ECE</th><th>Jev ECE</th><th>Laya ms/call</th><th>Jev ms/call</th></tr></thead>
+      <tbody></tbody>
+    </table></div>
+  </section>
+
+  <section>
+    <h2>Per question</h2>
+    <p class="lede">Where the gap sits inside each suite. Laya's weakest questions are ticket intent (0.73), toxicity (0.77) and urgency (0.75). It beats Jev on churn risk.</p>
+    <div class="tablewrap"><table id="pq">
+      <thead><tr><th>Suite</th><th>Question</th><th>Laya</th><th>Jev</th><th>Δ</th></tr></thead>
+      <tbody></tbody>
+    </table></div>
+  </section>
+
+  <section>
+    <h2>Multilingual intent, case by case</h2>
+    <p class="lede">The same five support requests in each of five languages, sorted into six intents. <b>EN</b> is the English checkpoint the published benchmark uses; <b>ML</b> is <code>laya-multilingual</code>. The English model falls back to “other” on text it can't read, and scores zero on Hindi.</p>
+    <div class="langs" id="langs"></div>
+  </section>
+
+  <section>
+    <h2>Method and caveats</h2>
+    <ul class="notes">
+      <li>The suites came from <a href="https://github.com/instax-dutta/sysone-bench">instax-dutta/sysone-bench</a> and ran through its own <code>run_suite</code> scoring. A small wrapper, <code>run_subset.py</code>, picked five suites and left the repo's code unchanged.</li>
+      <li>Suites run: triage, guardrails, moderation (curated) and banking77_12, multilingual_intent (public). Skipped: agnews, mnli, emotion, sst5, and the speed-scaling test.</li>
+      <li>The Jev columns are copied from <code>results/run_jev-1.13.0_20260921-212125.json</code> in that repo. Jev was not called from this machine, and its latency includes the network round trip to TypeSafe's API.</li>
+      <li>Samples are small (25–160 decisions per suite). With 25 cases, one answer moves accuracy by 4 points, so read the gaps as direction, not decimals.</li>
+      <li>The multilingual checkpoint was scored only on multilingual_intent. It's a smaller model (322M vs 421M), which is why it's faster, and it wasn't tested on the English suites.</li>
+      <li>Both Laya models are stock, not fine-tuned. Reviews report fine-tuning on your own data is where Laya's accuracy moves most.</li>
+    </ul>
+  </section>
+
+  <footer>Raw results: <code>scratchpad/sysone-bench/results/subset_laya_20260923-203612.json</code></footer>
+</main>
+
+<script>
+const SUITES=[
+ {id:"triage",name:"Triage",kind:"support tickets",n:160,la:.8,je:.8875,lae:.0793,jee:.0533,lms:632.6,jms:1066.1,
+  pq:{intent:[.725,.975],refund_requested:[.925,1],churn_risk:[.8,.725],is_urgent:[.75,.85]}},
+ {id:"guardrails",name:"Guardrails",kind:"jailbreak / injection",n:60,la:.8833,je:.9667,lae:.0652,jee:.049,lms:449.3,jms:1049.3,
+  pq:{jailbreak:[.9,1],prompt_injection:[.8667,.9333]}},
+ {id:"moderation",name:"Moderation",kind:"toxic / threat / spam",n:90,la:.8333,je:.9889,lae:.0819,jee:.0518,lms:575.2,jms:1068.4,
+  pq:{toxic:[.7667,1],threat:[.8667,.9667],spam:[.8667,1]}},
+ {id:"banking",name:"Banking77 (12)",kind:"12 intents",n:96,la:.8021,je:.9062,lae:.1882,jee:.087,lms:278,jms:1013.7,
+  pq:{intent:[.8021,.9062]}},
+ {id:"ml",name:"Multilingual intent",kind:"5 languages",n:25,la:.36,je:1,lae:.306,jee:.0036,lms:192,jms:938.6,ml:.92,mle:.1012,mlms:64.6,
+  pq:{intent:[.36,1]}}
+];
+const CASES=[["मुझसे दो बार शुल्क लिया गया, कृपया पैसे वापस करें।","refund","other","refund"],["मेरा ऐप बार-बार क्रैश हो रहा है, कृपया मदद करें।","technical_help","other","technical_help"],["कृपया मेरी सदस्यता तुरंत रद्द करें।","cancellation","other","cancellation"],["मेरे चालान में यह शुल्क क्या है?","billing_question","other","billing_question"],["क्या आपके पास टीमों के लिए कोई ट्यूटोरियल है?","information","other","information"],
+["Me cobraron dos veces, quiero un reembolso por favor.","refund","refund","refund"],["La aplicación se bloquea al exportar, necesito ayuda.","technical_help","technical_help","technical_help"],["Cancele mi suscripción de inmediato.","cancellation","cancellation","cancellation"],["¿Por qué mi plan se renovó a un precio mayor?","billing_question","other","billing_question"],["¿Tienen algún tutorial para equipos nuevos?","information","other","information"],
+["On m'a facturé deux fois, je veux un remboursement.","refund","refund","refund"],["L'application plante à l'export, aidez-moi s'il vous plaît.","technical_help","technical_help","technical_help"],["Veuillez annuler mon abonnement immédiatement.","cancellation","cancellation","cancellation"],["Pourquoi mon forfait a-t-il été renouvelé plus cher ?","billing_question","refund","refund"],["Avez-vous un tutoriel pour les nouvelles équipes ?","information","other","information"],
+["Mir wurde zweimal berechnet, ich möchte eine Rückerstattung.","refund","cancellation","refund"],["Die App stürzt beim Export ab, bitte helfen Sie mir.","technical_help","technical_help","technical_help"],["Bitte kündigen Sie mein Abonnement sofort.","cancellation","cancellation","cancellation"],["Warum wurde mein Plan teurer verlängert?","billing_question","other","billing_question"],["Gibt es ein Tutorial für neue Teams?","information","other","information"],
+["تم فرض رسوم مضاعفة عليّ، أريد استرداد المبلغ.","refund","refund","refund"],["التطبيق يتعطل عند التصدير، أحتاج إلى مساعدة.","technical_help","other","technical_help"],["يرجى إلغاء اشتراكي فورًا.","cancellation","other","cancellation"],["لماذا تم تجديد خطتي بسعر أعلى؟","billing_question","other","information"],["هل لديكم شرح للفرق الجديدة؟","information","refund","information"]];
+const LANGS=[["Hindi","ltr"],["Spanish","ltr"],["French","ltr"],["German","ltr"],["Arabic","rtl"]];
+const f2=v=>v.toFixed(2), pts=v=>(v>0?"+":"")+Math.round(v*100);
+const el=(t,a={},h="")=>{const e=document.createElement(t);for(const k in a)e.setAttribute(k,a[k]);e.innerHTML=h;return e};
+
+// chart
+(function(){
+  const W=900,L=170,R=56,top=28,bh=13,gap=4,grp=22;
+  const rows=SUITES.map(s=>[["laya",s.la],...(s.ml!=null?[["ml",s.ml]]:[]),["jev",s.je]]);
+  let y=top, parts=[];
+  const x=v=>L+v*(W-L-R);
+  [0,.25,.5,.75,1].forEach(t=>{parts.push(`<line x1="${x(t)}" x2="${x(t)}" y1="${top-8}" y2="__H__" stroke="var(--rule)" stroke-width="1"/>`,`<text x="${x(t)}" y="${top-14}" text-anchor="middle">${t.toFixed(2)}</text>`)});
+  SUITES.forEach((s,i)=>{
+    const h=rows[i].length*(bh+gap)-gap;
+    parts.push(`<text class="lab" x="0" y="${y+h/2-2}">${s.name}</text><text x="0" y="${y+h/2+14}">${s.kind} · n=${s.n}</text>`);
+    rows[i].forEach(([k,v])=>{
+      const c=k==="laya"?"var(--laya)":k==="ml"?"var(--ml)":"var(--jev)";
+      parts.push(`<rect x="${L}" y="${y}" width="${x(v)-L}" height="${bh}" rx="2" fill="${c}"/><text class="val" x="${x(v)+6}" y="${y+bh-2}">${f2(v)}</text>`);
+      y+=bh+gap;
+    });
+    y+=grp-gap;
+  });
+  const H=y-grp+10;
+  document.getElementById("chart").innerHTML=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Accuracy by suite for Laya and Jev">${parts.join("").replaceAll("__H__",H-6)}</svg>`;
+})();
+
+// main table
+(function(){
+  const tb=document.querySelector("#tbl tbody");
+  SUITES.forEach(s=>{
+    const d=s.la-s.je;
+    tb.append(el("tr",{},`<td>${s.name}</td><td class="n">${s.n}</td><td class="n">${f2(s.la)}</td><td class="n">${f2(s.je)}</td><td><span class="d ${d<0?"neg":"pos"}">${pts(d)}</span></td><td class="n">${f2(s.lae)}</td><td class="n">${f2(s.jee)}</td><td class="n">${Math.round(s.lms)}</td><td class="n">${Math.round(s.jms)}</td>`));
+    if(s.ml!=null){const d2=s.ml-s.je;
+      tb.append(el("tr",{},`<td>↳ multilingual checkpoint<span class="sub">laya-multilingual, 322M</span></td><td class="n">${s.n}</td><td class="n">${f2(s.ml)}</td><td class="n">${f2(s.je)}</td><td><span class="d ${d2<0?"neg":"pos"}">${pts(d2)}</span></td><td class="n">${f2(s.mle)}</td><td class="n">${f2(s.jee)}</td><td class="n">${Math.round(s.mlms)}</td><td class="n">${Math.round(s.jms)}</td>`));}
+  });
+})();
+
+// per question
+(function(){
+  const tb=document.querySelector("#pq tbody");
+  SUITES.filter(s=>s.id!=="banking"&&s.id!=="ml").forEach(s=>{
+    Object.entries(s.pq).forEach(([q,[a,b]],i)=>{
+      const d=a-b;
+      tb.append(el("tr",{},`<td>${i===0?s.name:""}</td><td style="text-align:left"><code>${q}</code></td><td class="n">${f2(a)}</td><td class="n">${f2(b)}</td><td><span class="d ${d<0?"neg":"pos"}">${pts(d)}</span></td>`));
+    });
+  });
+})();
+
+// multilingual cases
+(function(){
+  const box=document.getElementById("langs");
+  LANGS.forEach(([name,dir],li)=>{
+    const cs=CASES.slice(li*5,li*5+5);
+    const en=cs.filter(c=>c[2]===c[1]).length, ml=cs.filter(c=>c[3]===c[1]).length;
+    const card=el("div",{class:"lang"},`<header><h3>${name}</h3><span class="score">EN <b>${en}/5</b> · ML <b>${ml}/5</b></span></header>`);
+    cs.forEach(([m,exp,pe,pm])=>{
+      card.append(el("div",{class:"case"},`<div class="msg" dir="${dir}">${m}</div><div class="row"><span class="chip exp">want: ${exp}</span><span class="chip ${pe===exp?"ok":"no"}">EN ${pe===exp?"✓":"→ "+pe}</span><span class="chip ${pm===exp?"ok":"no"}">ML ${pm===exp?"✓":"→ "+pm}</span></div>`));
+    });
+    box.append(card);
+  });
+})();
+</script>
